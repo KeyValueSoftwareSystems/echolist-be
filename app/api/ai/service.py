@@ -170,6 +170,32 @@ class AIService:
                 detail=f"Error classifying text with LLM: {str(e)}"
             )
 
+    def summarize_texts_with_llm(self, texts: List[str]) -> str:
+        print("texts: ", texts)
+        """Summarizes a list of texts using an LLM."""
+        try:
+            llm = ChatOpenAI(openai_api_key=self.openai_api_key, model="gpt-4o-mini", temperature=0.5)
+
+            combined_text = "\n\n".join(texts)
+
+            prompt = (
+                f"Please provide a concise summary of the following texts:\n\n{combined_text}"
+            )
+            
+            messages = [HumanMessage(content=prompt)]
+            response = llm.invoke(messages)
+            
+            return response.content
+            
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error summarizing texts with LLM: {str(e)}"
+            )
+
+
 ai_service = None
 
 def get_ai_service():

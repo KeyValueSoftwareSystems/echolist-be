@@ -201,6 +201,7 @@ class QueryResult(BaseModel):
 class QueryResponse(BaseModel):
     results: List[QueryResult]
     query: str
+    summary: Optional[str] = None
 
 # Text Classification Schemas
 class TextClassificationRequest(BaseModel):
