@@ -3,12 +3,13 @@ import os
 import time
 from typing import List, Optional
 from pinecone import Pinecone, ServerlessSpec, PodSpec 
-from langchain_openai import OpenAIEmbeddings
+from langchain_openai import OpenAIEmbeddings, ChatOpenAI
 from langchain.text_splitter import RecursiveCharacterTextSplitter
 from langchain.schema import Document
 from langchain_pinecone import PineconeVectorStore 
 from fastapi import HTTPException, status
 from dotenv import load_dotenv
+from langchain_core.messages import HumanMessage
 
 load_dotenv()
 
@@ -36,7 +37,7 @@ class AIService:
         #     print(f"Pinecone index '{self.index_name}' already exists.")
             
         self.embedding_model = OpenAIEmbeddings(openai_api_key=self.openai_api_key, model="text-embedding-3-small")
-        
+        print("embedding_model: ", self.embedding_model)
         self.vectordb = PineconeVectorStore(
             index_name=self.index_name,
             embedding=self.embedding_model,
@@ -51,12 +52,12 @@ class AIService:
     def hash_text(self, text: str) -> str:
         return hashlib.md5(text.encode()).hexdigest()
     
-    def vectorize_and_store(self, text: str, metadata: dict = {}) -> dict:
+    def vectorize_and_store(self, text: str, metadata: dict = {}, sections_data: List[dict] = None) -> dict:
         try:
             hash_id = self.hash_text(text)
-            
+            print("hash_id: ", hash_id)
             while not self.pc.describe_index(self.index_name).status['ready']:
-                print(f"Waiting for index '{self.index_name}' to bAe ready...")
+                print(f"Waiting for index '{self.index_name}' to be ready...")
                 time.sleep(1)
 
             index = self.pc.Index(self.index_name)
@@ -67,7 +68,7 @@ class AIService:
                 filter={"original_hash_id": {"$eq": hash_id}},
                 include_metadata=False
             )
-            
+            print("query_results: ", query_results)
             if query_results and query_results.matches:
                 return {
                     "message": "Original text already exists (based on hash), skipping.",
@@ -88,12 +89,22 @@ class AIService:
                 )
                 for idx, chunk in enumerate(chunks)
             ]
+            print("docs: ", docs)
+            print("openai_api_key: ", self.openai_api_key)
             self.vectordb.add_documents(docs)
+            
+            # Classify text if sections data is provided
+            classification_result = None
+            print("sections_data: ", sections_data)
+            if sections_data:
+                classification_result = self.classify_text_with_llm(text, sections_data)
+                print(classification_result)
             
             return {
                 "message": f"Stored {len(docs)} chunks successfully.",
                 "chunks_count": len(docs),
-                "hash_id": hash_id
+                "hash_id": hash_id,
+                "classification": classification_result
             }
             
         except HTTPException as e:
@@ -123,6 +134,60 @@ class AIService:
             raise HTTPException(
                 status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 detail=f"Error querying text: {str(e)}"
+            )
+
+    def classify_text_with_llm(self, text_to_classify: str, sections_data: List[dict]) -> dict:
+        """Classifies text into a section using an LLM based on provided section details."""
+        try:
+            llm = ChatOpenAI(openai_api_key=self.openai_api_key, model="gpt-4o-mini", temperature=0)
+
+            sections_str = ""
+            for i, section in enumerate(sections_data):
+                sections_str += f"{i+1}. Section Name: '{section.get('section_name', 'N/A')}'\n"
+                sections_str += f"   Description: '{section.get('template_description', section.get('section_name', 'N/A'))}'\n"
+                sections_str += f"   Section ID: {section.get('section_id', 'N/A')}\n"
+
+            prompt = (
+                f"New Text to Classify: \"{text_to_classify}\"\n\n"
+                f"Existing Sections:\n{sections_str}\n"
+                "Identify which of the 'Existing Sections' the 'New Text to Classify' best belongs to. "
+                "If it doesn't fit any, state 'None'. "
+                "Your response must be a JSON object with two fields: 'predicted_section_name' (string) and 'section_id' (integer, or null if 'None'). "
+                "Strictly adhere to the section names and IDs provided. If no section matches, set 'predicted_section_name' to 'None' and 'section_id' to null. "
+                "Do not include any other text or explanation in your response.\n\n"
+            )
+            
+            messages = [HumanMessage(content=prompt)]
+            response = llm.invoke(messages)
+            
+            # Attempt to parse JSON response from LLM
+            import json
+            try:
+                llm_output = json.loads(response.content)
+                predicted_section_name = llm_output.get("predicted_section_name")
+                section_id = llm_output.get("section_id")
+
+                # Optional: Add confidence if the LLM model supports it or if we calculate it
+                # For now, we'll return fixed 1.0 if a match is found, else 0.0
+                confidence_score = 1.0 if predicted_section_name != "None" else 0.0
+                
+                return {
+                    "predicted_section_name": predicted_section_name,
+                    "confidence_score": confidence_score,
+                    "section_id": section_id
+                }
+            except json.JSONDecodeError:
+                raise HTTPException(
+                    status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                    detail="LLM response was not valid JSON or could not be parsed."
+                )
+
+        except HTTPException as e:
+            raise e
+        except Exception as e:
+            raise HTTPException(
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+                detail=f"Error classifying text with LLM: {str(e)}"
             )
 
 ai_service = None

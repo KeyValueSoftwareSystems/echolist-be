@@ -1,10 +1,12 @@
 from fastapi import APIRouter, Depends, HTTPException, status, Query
 from typing import List, Optional
+from sqlalchemy.orm import Session
 
 from app.schemas.schemas import TextPayload, VectorizeResponse, QueryResponse, QueryResult
 from app.api.ai.service import get_ai_service
 from app.core.security import get_current_active_user
-from app.models.models import User
+from app.models.models import User, Section
+from app.db.database import get_db
 
 router = APIRouter(
     prefix="/ai",
@@ -15,19 +17,37 @@ router = APIRouter(
 @router.post("/vectorize", response_model=VectorizeResponse)
 def vectorize_and_store(
     payload: TextPayload,
-    current_user: User = Depends(get_current_active_user)
+    current_user: User = Depends(get_current_active_user),
+    db: Session = Depends(get_db)
 ):
-    """Vectorize text and store in Pinecone vector database."""
+    """Vectorize text and store in Pinecone vector database, with optional section classification."""
     try:
         # Add user context to metadata
+        print('current_user: ', current_user)
         metadata = {
             **payload.metadata,
             "user_id": current_user.user_id,
             "username": current_user.username
         }
         
+        # Fetch all sections for the current user for classification
+        sections = db.query(Section).filter(
+            Section.owner_user_id == current_user.user_id
+        ).all()
+
+        sections_data = None
+        if sections:
+            sections_data = [
+                {
+                    "section_id": section.section_id,
+                    "section_name": section.section_name,
+                    "template_description": section.template_description
+                }
+                for section in sections
+            ]
+        
         ai_service = get_ai_service()
-        result = ai_service.vectorize_and_store(payload.text, metadata)
+        result = ai_service.vectorize_and_store(payload.text, metadata, sections_data)
         return VectorizeResponse(**result)
         
     except Exception as e:

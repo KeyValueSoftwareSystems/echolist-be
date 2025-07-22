@@ -187,6 +187,7 @@ class VectorizeResponse(BaseModel):
     message: str
     chunks_count: int
     hash_id: str
+    classification: Optional[dict] = None
 
 class QueryResult(BaseModel):
     text: str
@@ -196,3 +197,12 @@ class QueryResult(BaseModel):
 class QueryResponse(BaseModel):
     results: List[QueryResult]
     query: str
+
+# Text Classification Schemas
+class TextClassificationRequest(BaseModel):
+    text_to_classify: str
+
+class TextClassificationResponse(BaseModel):
+    predicted_section_name: Optional[str]
+    confidence_score: Optional[float] = None
+    section_id: Optional[int] = None
