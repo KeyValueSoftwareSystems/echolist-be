@@ -28,14 +28,14 @@ class AIService:
         
         self.pc = Pinecone(api_key=self.pinecone_api_key)
         
-        if self.index_name not in self.pc.list_indexes():
-            print(f"Creating Pinecone index: {self.index_name}...")
-            self.pc.create_index(name=self.index_name, dimension=1536, metric="cosine", spec=ServerlessSpec())
-            print(f"Pinecone index '{self.index_name}' created.")
-        else:
-            print(f"Pinecone index '{self.index_name}' already exists.")
+        # if self.index_name not in self.pc.list_indexes():
+        #     print(f"Creating Pinecone index: {self.index_name}...")
+        #     self.pc.create_index(name=self.index_name, dimension=1536, metric="cosine", spec=ServerlessSpec(cloud="aws", region="us-east-1"))
+        #     print(f"Pinecone index '{self.index_name}' created.")
+        # else:
+        #     print(f"Pinecone index '{self.index_name}' already exists.")
             
-        self.embedding_model = OpenAIEmbeddings(openai_api_key=self.openai_api_key)
+        self.embedding_model = OpenAIEmbeddings(openai_api_key=self.openai_api_key, model="text-embedding-3-small")
         
         self.vectordb = PineconeVectorStore(
             index_name=self.index_name,
@@ -56,7 +56,7 @@ class AIService:
             hash_id = self.hash_text(text)
             
             while not self.pc.describe_index(self.index_name).status['ready']:
-                print(f"Waiting for index '{self.index_name}' to be ready...")
+                print(f"Waiting for index '{self.index_name}' to bAe ready...")
                 time.sleep(1)
 
             index = self.pc.Index(self.index_name)
@@ -88,7 +88,6 @@ class AIService:
                 )
                 for idx, chunk in enumerate(chunks)
             ]
-            
             self.vectordb.add_documents(docs)
             
             return {
