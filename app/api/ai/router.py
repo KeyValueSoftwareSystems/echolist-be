@@ -76,8 +76,12 @@ def query_text(
             )
             for result in results
         ]
-        
-        return QueryResponse(results=query_results, query=q)
+        # print("query_results: ", query_results)
+        results_response = QueryResponse(results=query_results, query=q)
+        print("results: ", results_response)
+        summary = ai_service.summarize_texts_with_llm([result.text for result in query_results])
+        results_response.summary = summary
+        return results_response
         
     except Exception as e:
         raise HTTPException(
