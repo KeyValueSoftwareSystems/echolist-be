@@ -29,3 +29,6 @@ langchain_pinecone==0.2.9
 langchain_core>=0.3.70
 pinecone==7.3.0
 
+# Speech-to-Text Dependencies
+openai-whisper==20231117
+
