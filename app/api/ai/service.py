@@ -37,7 +37,6 @@ class AIService:
         #     print(f"Pinecone index '{self.index_name}' already exists.")
             
         self.embedding_model = OpenAIEmbeddings(openai_api_key=self.openai_api_key, model="text-embedding-3-small")
-        print("embedding_model: ", self.embedding_model)
         self.vectordb = PineconeVectorStore(
             index_name=self.index_name,
             embedding=self.embedding_model,
@@ -55,7 +54,6 @@ class AIService:
     def vectorize_and_store(self, text: str, metadata: dict = {}, sections_data: List[dict] = None) -> dict:
         try:
             hash_id = self.hash_text(text)
-            print("hash_id: ", hash_id)
             while not self.pc.describe_index(self.index_name).status['ready']:
                 print(f"Waiting for index '{self.index_name}' to be ready...")
                 time.sleep(1)
@@ -68,7 +66,6 @@ class AIService:
                 filter={"original_hash_id": {"$eq": hash_id}},
                 include_metadata=False
             )
-            print("query_results: ", query_results)
             if query_results and query_results.matches:
                 return {
                     "message": "Original text already exists (based on hash), skipping.",
@@ -89,8 +86,6 @@ class AIService:
                 )
                 for idx, chunk in enumerate(chunks)
             ]
-            print("docs: ", docs)
-            print("openai_api_key: ", self.openai_api_key)
             self.vectordb.add_documents(docs)
             
             # Classify text if sections data is provided
