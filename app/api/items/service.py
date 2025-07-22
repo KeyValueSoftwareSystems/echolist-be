@@ -1,3 +1,4 @@
+from requests import get
 from fastapi import HTTPException, status, UploadFile, File
 from sqlalchemy.orm import Session
 from typing import List, Optional, Dict, Any
@@ -93,23 +94,20 @@ class ItemService:
             # If transcription fails, use a placeholder
             content_text = f"Voice note: {audio_file.filename} (Transcription failed: {str(e)})"
         
-        # Store the audio file and get URL (this would be implemented elsewhere)
-        # For now, we'll use a placeholder
-        audio_filename = f"user_{current_user.user_id}_{datetime.utcnow().strftime('%Y%m%d%H%M%S')}.wav"
-        audio_url = f"/storage/audio/{audio_filename}"
-        
-        # Create vector embedding for the content
-        vector_embedding = await create_embedding(content_text)
-        
         # Store in vector database with metadata
         metadata = {
             "user_id": current_user.user_id,
             "username": current_user.username,
             "item_type": "voice_note"
         }
-        ai_service = get_ai_service()
-        ai_service.vectorize_and_store(content_text, metadata)
-        
+
+        try:
+            ai_service = get_ai_service()
+            vector_embedding = ai_service.vectorize_and_store(content_text, metadata)
+        except Exception as e:
+            print("Error vectorizing voice note:", e)
+            vector_embedding = None
+
         # Find the user's default section or create one if it doesn't exist
         # default_sections = self.repository.db.query(Section).filter(
         #     Section.owner_user_id == current_user.user_id,
