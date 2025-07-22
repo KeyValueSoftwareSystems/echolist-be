@@ -60,7 +60,7 @@ class TokenData(BaseModel):
     username: Optional[str] = None
 
 class LoginRequest(BaseModel):
-    username: str
+    email: EmailStr
     password: str
 
 # Connection Schemas
