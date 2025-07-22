@@ -36,7 +36,7 @@ def vectorize_and_store(
             detail=f"Failed to vectorize text: {str(e)}"
         )
 
-@router.get("/query", response_model=QueryResponse)
+@router.post("/ask/text", response_model=QueryResponse)
 def query_text(
     q: str = Query(..., description="Query text to search for"),
     k: int = Query(3, description="Number of results to return", ge=1, le=10),
