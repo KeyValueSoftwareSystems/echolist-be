@@ -1,57 +1,74 @@
-# Byte-compiled / cached / virtual environment files
+# Byte-compiled / optimized / DLL files
 __pycache__/
 *.py[cod]
+*$py.class
+
+# C extensions
 *.so
-*.egg
-*.egg-info/
-dist/
+
+# Distribution / packaging
+.Python
 build/
-*.manifest
-*.spec
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
 
-# Virtual environment folders
-venv/
+# Unit test / coverage reports
+htmlcov/
+.tox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+
+# Environments
+.env
+.venv
 env/
-.venv/
+venv/
+ENV/
+env.bak/
+venv.bak/
 
-# Python & package logs
-*.log
-pip-log.txt
-pip-delete-this-directory.txt
-
-# IDE/editor settings
-.vscode/
+# IDE specific files
 .idea/
+.vscode/
 *.swp
 *.swo
 
-# Jupyter Notebook checkpoints
-.ipynb_checkpoints/
-
-# OS-specific
-.DS_Store
-Thumbs.db
-
-# dotenv and secrets
-.env
-.env.*
-
-# pytest and coverage
-.pytest_cache/
-htmlcov/
-coverage.xml
-*.cover
-
-# mypy
-.mypy_cache/
-
-# FastAPI docs (if auto-generated)
-docs/
-openapi.json
-
-# Local dev database and SQLite files
+# Database
 *.db
 *.sqlite3
 
-# Pydantic cache
-__pydantic__/
+# Logs
+logs/
+*.log
+
+# Local development settings
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# ngrok
+ngrok.yml
+.ngrok/
+
+# OS specific
+.DS_Store
+Thumbs.db
