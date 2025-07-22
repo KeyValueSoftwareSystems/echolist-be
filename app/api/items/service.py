@@ -128,9 +128,8 @@ class ItemService:
         #     section_id = default_section.section_id
         # else:
         #     section_id = default_sections[0].section_id
-        
         item_data = {
-            "section_id": 1,
+            "section_id": vector_embedding['classification']['section_id'] or 1,
             "creator_user_id": current_user.user_id,
             "content_text": content_text,
             "is_task": False,
