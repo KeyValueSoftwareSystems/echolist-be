@@ -58,21 +58,6 @@ class AIService:
                 print(f"Waiting for index '{self.index_name}' to be ready...")
                 time.sleep(1)
 
-            index = self.pc.Index(self.index_name)
-            
-            # query_results = index.query(
-            #     vector=[0.0] * 1536,
-            #     top_k=1,
-            #     filter={"original_hash_id": {"$eq": hash_id}},
-            #     include_metadata=False
-            # )
-            # if query_results and query_results.matches:
-            #     return {
-            #         "message": "Original text already exists (based on hash), skipping.",
-            #         "chunks_count": 0,
-            #         "hash_id": hash_id
-            #     }
-
             chunks = self.text_splitter.split_text(text)
             
             docs = [
