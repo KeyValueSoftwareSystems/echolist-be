@@ -1,0 +1,57 @@
+# Byte-compiled / cached / virtual environment files
+__pycache__/
+*.py[cod]
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+*.manifest
+*.spec
+
+# Virtual environment folders
+venv/
+env/
+.venv/
+
+# Python & package logs
+*.log
+pip-log.txt
+pip-delete-this-directory.txt
+
+# IDE/editor settings
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# Jupyter Notebook checkpoints
+.ipynb_checkpoints/
+
+# OS-specific
+.DS_Store
+Thumbs.db
+
+# dotenv and secrets
+.env
+.env.*
+
+# pytest and coverage
+.pytest_cache/
+htmlcov/
+coverage.xml
+*.cover
+
+# mypy
+.mypy_cache/
+
+# FastAPI docs (if auto-generated)
+docs/
+openapi.json
+
+# Local dev database and SQLite files
+*.db
+*.sqlite3
+
+# Pydantic cache
+__pydantic__/
