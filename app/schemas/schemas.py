@@ -63,6 +63,14 @@ class LoginRequest(BaseModel):
     email: EmailStr
     password: str
 
+class UserAuthResponse(BaseModel):
+    id: str
+    name: str
+    email: str
+    token: str
+    createdAt: datetime
+    updatedAt: Optional[datetime] = None
+
 # Connection Schemas
 class ConnectionBase(BaseModel):
     user_b_id: int

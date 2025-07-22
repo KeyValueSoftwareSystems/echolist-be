@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 
 from app.db.database import get_db
-from app.schemas.schemas import Token, UserCreate, UserResponse, LoginRequest
+from app.schemas.schemas import Token, UserCreate, UserResponse, LoginRequest, UserAuthResponse
 from app.api.auth.service import AuthService
 
 router = APIRouter(
@@ -17,7 +17,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     auth_service = AuthService(db)
     return auth_service.register_user(user.username, user.email, user.password)
 
-@router.post("/signin", response_model=Token)
+@router.post("/signin", response_model=UserAuthResponse)
 def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     """Login and get access token using email and password."""
     auth_service = AuthService(db)
