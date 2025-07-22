@@ -17,7 +17,7 @@ def register(user: UserCreate, db: Session = Depends(get_db)):
     auth_service = AuthService(db)
     return auth_service.register_user(user.username, user.email, user.password)
 
-@router.post("/login", response_model=Token)
+@router.post("/signin", response_model=Token)
 def login(login_data: LoginRequest, db: Session = Depends(get_db)):
     """Login and get access token using email and password."""
     auth_service = AuthService(db)
