@@ -25,7 +25,7 @@ async def create_item(
     item_service = ItemService(db)
     return await item_service.create_item(item, current_user)
 
-@router.post("/voice", response_model=ItemResponse)
+@router.post("/create", response_model=ItemResponse)
 async def create_voice_item(
     audio_file: UploadFile = File(...),
     current_user: User = Depends(get_current_active_user),
