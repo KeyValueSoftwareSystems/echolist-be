@@ -24,11 +24,11 @@ greenlet==3.1.1
 
 # AI and Vector Database Dependencies
 langchain>=0.1.0
-langchain-openai==0.3.28
-langchain-text-splitters>=0.0.1
+langchain_openai==0.3.28
 langchain-pinecone==0.2.9
 langchain-core>=0.3.70
 langchain-community>=0.0.20
 langsmith>=0.4.8
-pinecone-client==7.3.0
+langchain_pinecone=0.2.9
+pinecone=7.3.0
 tiktoken==0.9.0
