@@ -37,7 +37,7 @@ class AuthService:
         return self.repository.create_user(username, email, hashed_password)
     
     def authenticate_user(self, username_or_email: str, password: str):
-        """Authenticate a user and return an access token.
+        """Authenticate a user and return an access token along with user details.
         
         Args:
             username_or_email: Can be either username or email
@@ -72,4 +72,12 @@ class AuthService:
             data={"sub": user.username}, expires_delta=access_token_expires
         )
         
-        return {"access_token": access_token, "token_type": "bearer"}
+        # Return user details along with token
+        return {
+            "id": str(user.user_id),
+            "name": user.username,
+            "email": user.email,
+            "token": access_token,
+            "createdAt": user.created_at,
+            "updatedAt": user.last_login
+        }
