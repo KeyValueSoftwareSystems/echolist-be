@@ -28,13 +28,7 @@ class AIService:
             raise ValueError("OPENAI_API_KEY environment variable is required for OpenAI embeddings")
         
         self.pc = Pinecone(api_key=self.pinecone_api_key)
-        
-        # if self.index_name not in self.pc.list_indexes():
-        #     print(f"Creating Pinecone index: {self.index_name}...")
-        #     self.pc.create_index(name=self.index_name, dimension=1536, metric="cosine", spec=ServerlessSpec(cloud="aws", region="us-east-1"))
-        #     print(f"Pinecone index '{self.index_name}' created.")
-        # else:
-        #     print(f"Pinecone index '{self.index_name}' already exists.")
+
             
         self.embedding_model = OpenAIEmbeddings(openai_api_key=self.openai_api_key, model="text-embedding-3-small")
         self.vectordb = PineconeVectorStore(
@@ -171,7 +165,6 @@ class AIService:
             )
 
     def summarize_texts_with_llm(self, texts: List[str]) -> str:
-        print("texts: ", texts)
         """Summarizes a list of texts using an LLM."""
         try:
             llm = ChatOpenAI(openai_api_key=self.openai_api_key, model="gpt-4o-mini", temperature=0.5)
@@ -179,7 +172,9 @@ class AIService:
             combined_text = "\n\n".join(texts)
 
             prompt = (
-                f"Please provide a concise summary of the following texts:\n\n{combined_text}"
+                f"Based on the following individual text snippets, please provide a single, concise, and human-readable summary. "
+                f"Focus on the main themes and key information presented across all snippets. "
+                f"Avoid listing each snippet separately; instead, synthesize the information naturally.\n\n{combined_text}"
             )
             
             messages = [HumanMessage(content=prompt)]

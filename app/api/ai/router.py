@@ -23,7 +23,6 @@ def vectorize_and_store(
     """Vectorize text and store in Pinecone vector database, with optional section classification."""
     try:
         # Add user context to metadata
-        print('current_user: ', current_user)
         metadata = {
             **payload.metadata,
             "user_id": current_user.user_id,
@@ -76,9 +75,7 @@ def query_text(
             )
             for result in results
         ]
-        # print("query_results: ", query_results)
         results_response = QueryResponse(results=query_results, query=q)
-        print("results: ", results_response)
         summary = ai_service.summarize_texts_with_llm([result.text for result in query_results])
         results_response.summary = summary
         return results_response
