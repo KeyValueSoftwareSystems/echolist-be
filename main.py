@@ -9,6 +9,7 @@ from app.api.connections import router as connections_router
 from app.api.sections import router as sections_router
 from app.api.items import router as items_router
 from app.api.home import router as home_router
+from app.api.ai import router as ai_router
 from app.db.database import engine
 from app.models import models
 
@@ -36,6 +37,7 @@ app.include_router(connections_router.router, prefix="/api")
 app.include_router(sections_router.router, prefix="/api")
 app.include_router(items_router.router, prefix="/api")
 app.include_router(home_router.router, prefix="/api")
+app.include_router(ai_router.router, prefix="/api")
 
 @app.get("/")
 def read_root():

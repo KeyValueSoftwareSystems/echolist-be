@@ -49,7 +49,7 @@ class UserResponse(UserBase):
     daily_streak_count: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Auth Schemas
 class Token(BaseModel):
@@ -82,7 +82,7 @@ class ConnectionResponse(ConnectionBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Section Schemas
 class SectionBase(BaseModel):
@@ -105,7 +105,7 @@ class SectionResponse(SectionBase):
     created_at: datetime
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Section Access Schemas
 class SectionAccessBase(BaseModel):
@@ -125,7 +125,7 @@ class SectionAccessResponse(SectionAccessBase):
     section_id: int
     
     class Config:
-        orm_mode = True
+        from_attributes = True
 
 # Item Schemas
 class ItemBase(BaseModel):
@@ -169,3 +169,22 @@ class HomeResponse(BaseModel):
     
     class Config:
         orm_mode = True
+
+# AI Schemas
+class TextPayload(BaseModel):
+    text: str
+    metadata: dict = {}
+
+class VectorizeResponse(BaseModel):
+    message: str
+    chunks_count: int
+    hash_id: str
+
+class QueryResult(BaseModel):
+    text: str
+    metadata: dict
+    score: Optional[float] = None
+
+class QueryResponse(BaseModel):
+    results: List[QueryResult]
+    query: str
