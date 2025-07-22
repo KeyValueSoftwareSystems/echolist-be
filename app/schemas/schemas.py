@@ -72,18 +72,22 @@ class UserAuthResponse(BaseModel):
     updatedAt: Optional[datetime] = None
 
 # Connection Schemas
-class ConnectionBase(BaseModel):
+class ConnectionCreateBase(BaseModel):
+    email: str
+    connection_type: ConnectionType
+
+class ConnectionResponseBase(BaseModel):
     user_b_id: int
     connection_type: ConnectionType
 
-class ConnectionCreate(ConnectionBase):
+class ConnectionCreate(ConnectionCreateBase):
     pass
 
 class ConnectionUpdate(BaseModel):
     connection_type: Optional[ConnectionType] = None
     status: Optional[ConnectionStatus] = None
 
-class ConnectionResponse(ConnectionBase):
+class ConnectionResponse(ConnectionResponseBase):
     connection_id: int
     user_a_id: int
     status: ConnectionStatus
